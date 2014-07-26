@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="brand_colour">#404041</color>
+
+    <color name="main_colour">#7DC004</color>
+    <color name="secondary_colour">#639505</color>
+
+    <color name="button_colour">#3D214E</color>
+</resources>

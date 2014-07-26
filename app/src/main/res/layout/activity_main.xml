@@ -1,6 +1,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:paddingBottom="@dimen/activity_vertical_margin"
@@ -11,90 +12,84 @@
 
 
 
-    <Button
+    <com.dd.CircularProgressButton
         android:id="@+id/wifi_unlock"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Wifi Unlock"/>
+        android:textColor="@color/white"
+        android:textSize="18sp"
+        app:cornerRadius="48dp"
+        app:iconComplete="@drawable/ic_action_accept"
+        app:iconError="@drawable/ic_action_cancel"
+        app:textIdle="Wifi Unlock"
+        />
+
+
+
+    <!--<Button-->
+        <!--android:id="@+id/button1"-->
+        <!--android:layout_width="fill_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:text="Start Alarm"-->
+        <!--android:onClick="startAlarm" />-->
+
+    <!--<Button-->
+        <!--android:id="@+id/button2"-->
+        <!--android:layout_width="fill_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:text="Cancel Alarm"-->
+        <!--android:onClick="cancelAlarm" />-->
+
+
+    <!--<EditText-->
+        <!--android:id="@+id/serialSendText"-->
+        <!--android:layout_width="310dp"-->
+        <!--android:layout_height="40dp"-->
+        <!--android:layout_marginTop="22dp"-->
+        <!--android:background="#555555"-->
+        <!--android:bufferType="editable"-->
+        <!--android:ems="10"-->
+        <!--android:inputType="text"-->
+        <!--android:hint="Data sending Area"-->
+        <!--android:textColor="#999999"-->
+        <!--android:textSize="20dip" />-->
+
+    <!--<Button-->
+        <!--android:id="@+id/buttonSerialSend"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:text="Send Data" />-->
+
+
+
+    <!--<TextView-->
+        <!--android:id="@+id/textView1"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content" />-->
+
+    <!--<TextView-->
+        <!--android:id="@+id/editText2"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_marginTop="20dp"-->
+        <!--android:ems="10"-->
+        <!--android:text="Received Data:"-->
+        <!--android:textSize="25sp" />-->
+
+
+    <!--<TextView-->
+        <!--android:id="@+id/serialReveicedText"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:ems="10"-->
+        <!--android:textSize="10sp" />-->
+
 
     <Button
         android:id="@+id/buttonScan"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Scan" />
-
-    <Button
-        android:id="@+id/register"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Register"/>
-
-    <!--<Button-->
-        <!--android:id="@+id/button_connect"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:text="Connect"/>-->
-
-
-    <Button
-        android:id="@+id/button1"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text="Start Alarm"
-        android:onClick="startAlarm" />
-
-    <Button
-        android:id="@+id/button2"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text="Cancel Alarm"
-        android:onClick="cancelAlarm" />
-
-
-    <EditText
-        android:id="@+id/serialSendText"
-        android:layout_width="310dp"
-        android:layout_height="40dp"
-        android:layout_marginTop="22dp"
-        android:background="#555555"
-        android:bufferType="editable"
-        android:ems="10"
-        android:inputType="text"
-        android:hint="Data sending Area"
-        android:textColor="#999999"
-        android:textSize="20dip" />
-
-    <Button
-        android:id="@+id/buttonSerialSend"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Send Data" />
-
-
-
-    <TextView
-        android:id="@+id/textView1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
-
-    <TextView
-        android:id="@+id/editText2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:ems="10"
-        android:text="Received Data:"
-        android:textSize="25sp" />
-
-
-    <TextView
-        android:id="@+id/serialReveicedText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:textSize="10sp" />
-
-
-
+        android:layout_width="1px"
+        android:layout_height="1px"
+        android:text="Scan"
+        android:visibility="invisible"/>
 
 </LinearLayout>

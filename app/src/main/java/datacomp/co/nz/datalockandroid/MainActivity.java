@@ -1,37 +1,39 @@
 package datacomp.co.nz.datalockandroid;
 
+import android.animation.ValueAnimator;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.os.AsyncTask;
 import android.os.Bundle;
 
 import android.content.Intent;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import com.dd.CircularProgressButton;
 
 public class MainActivity  extends BlunoLibrary {
     static final String TAG = "MainActivity";
 
+    //main flow views
     private Button buttonScan;
+    private CircularProgressButton buttonWifiUnlock;
     private Button buttonSerialSend;
     private EditText serialSendText;
     private TextView serialReceivedText;
-    private Button buttonConnect;
-    private Button buttonWifiUnlock;
-    private Button buttonRegister;
 
+    //Registration flow views
+    EditText email;
+    EditText password;
+    CircularProgressButton registerButton;
 
 
     private PendingIntent pendingIntent;
@@ -51,37 +53,56 @@ public class MainActivity  extends BlunoLibrary {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if (getPreferences(MODE_PRIVATE).getInt("PIN", -1) != -1) {
+            Log.d(TAG, "PIN: " + getPreferences(MODE_PRIVATE).getInt("PIN", -1));
+            mainFlow();
+        } else {
+            Log.d(TAG, "No Pin");
+            registrationFlow();
+        }
+
+
+
+//        buttonConnect.setOnClickListener(new OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                connectToDevice("D0:39:72:A0:9A:BE");
+//            }
+//        });
+
+
+//
+//        buttonScan.setOnClickListener(new OnClickListener() {
+//
+//            @Override
+//            public void onClick(View v) {
+//                // TODO Auto-generated method stub
+//
+////                buttonScanOnClickProcess();										//Alert Dialog for selecting the BLE device
+//            }
+//        });
+    }
+
+
+    private void mainFlow(){
+
         setContentView(R.layout.activity_main);
         onCreateProcess();														//onCreate Process by BlunoLibrary
 
         serialBegin(115200);
+        buttonWifiUnlock = (CircularProgressButton) findViewById(R.id.wifi_unlock);
+
+
+
         // Retrieve a PendingIntent that will perform a broadcast
-        Intent alarmIntent = new Intent(this, AlarmReceiver.class);
-        pendingIntent = PendingIntent.getBroadcast(this, 0, alarmIntent, 0);
-
-
-//set the Uart Baudrate on BLE chip to 115200
+//        Intent alarmIntent = new Intent(this, AlarmReceiver.class);
+//        pendingIntent = PendingIntent.getBroadcast(this, 0, alarmIntent, 0);
 
         serialReceivedText=(TextView) findViewById(R.id.serialReveicedText);	//initial the EditText of the received data
         serialSendText=(EditText) findViewById(R.id.serialSendText);			//initial the EditText of the sending data
 
-//        buttonConnect = (Button) findViewById(R.id.button_connect);
-        buttonWifiUnlock = (Button) findViewById(R.id.wifi_unlock);
-        buttonRegister = (Button) findViewById(R.id.register);
 
-        if (getPreferences(MODE_PRIVATE).getInt("PIN", -1) != -1) {
-            Log.d(TAG, "PIN: " + getPreferences(MODE_PRIVATE).getInt("PIN", -1));
-        } else {
-            Log.d(TAG, "No Pin");
-        }
-
-        buttonRegister.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d(TAG, "registering PIN");
-                getPreferences(MODE_PRIVATE).edit().putInt("PIN", 1234).commit();
-            }
-        });
 
         buttonWifiUnlock.setOnClickListener(new OnClickListener() {
             @Override
@@ -100,34 +121,80 @@ public class MainActivity  extends BlunoLibrary {
             }
         });
 
-//        buttonConnect.setOnClickListener(new OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                connectToDevice("D0:39:72:A0:9A:BE");
-//            }
-//        });
         buttonScan = (Button) findViewById(R.id.buttonScan);					//initial the button for scanning the BLE device
         buttonScanOnClickProcess();
-
-//
-//        buttonScan.setOnClickListener(new OnClickListener() {
-//
-//            @Override
-//            public void onClick(View v) {
-//                // TODO Auto-generated method stub
-//
-////                buttonScanOnClickProcess();										//Alert Dialog for selecting the BLE device
-//            }
-//        });
     }
 
+    private void registrationFlow(){
+        setContentView(R.layout.registration_layout);
 
-    private void mainFlow(){
+        email = (EditText) findViewById(R.id.email);
+        password = (EditText) findViewById(R.id.password);
+        registerButton = (CircularProgressButton) findViewById(R.id.register_button);
+
+
+        registerButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                registerButton.setProgress(0);
+                registerButton.setProgress(1);
+                if (email.getText().toString().trim().isEmpty() || password.getText().toString().trim().isEmpty()){
+                    //fail
+                    simulateErrorProgress(registerButton);
+                } else {
+                    //success
+
+                    simulateSuccessProgress(registerButton);
+                }
+            }
+        });
 
     }
 
-    private void welcomeFlow(){
+    private void simulateErrorProgress(final CircularProgressButton button) {
+        ValueAnimator widthAnimation = ValueAnimator.ofInt(1, 99);
+        widthAnimation.setDuration(500);
+        widthAnimation.setInterpolator(new AccelerateDecelerateInterpolator());
+        widthAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                Integer value = (Integer) animation.getAnimatedValue();
+                button.setProgress(value);
+                if (value == 99) {
+                    button.setProgress(-1);
+                }
+            }
+        });
+        widthAnimation.start();
+    }
 
+    private void simulateSuccessProgress(final CircularProgressButton button) {
+        ValueAnimator widthAnimation = ValueAnimator.ofInt(1, 100);
+        widthAnimation.setDuration(500);
+        widthAnimation.setInterpolator(new AccelerateDecelerateInterpolator());
+        widthAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                Integer value = (Integer) animation.getAnimatedValue();
+                button.setProgress(value);
+                Log.d(TAG, "animation value: " + value);
+                // Finish the activity at the end of animation
+                if (value == 100) {
+                    //move to main flow
+                    Handler h = new Handler();
+                    h.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            getPreferences(MODE_PRIVATE).edit().putInt("PIN", 1234).commit();
+                            mainFlow();
+                        }
+                    }, 700);
+
+
+                }
+            }
+        });
+        widthAnimation.start();
     }
 
 

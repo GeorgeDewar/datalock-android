@@ -463,15 +463,17 @@ public abstract  class BlunoLibrary extends Activity{
                     Log.d("BLAH", "address: " + device.getAddress());
 //					mLeDeviceListAdapter.notifyDataSetChanged();
                     if (device.getAddress().equals("D0:39:72:A0:9A:BE")){
-                        addRssi(rssi);
+                        addRssi(rssi, device);
 //                        Toast.makeText(getApplicationContext(), "rssi: " + rssi, Toast.LENGTH_SHORT).show();
+
+
                     }
 				}
 			});
 		}
 	};
 
-    private void addRssi (int rssi){
+    private void addRssi (int rssi, BluetoothDevice device){
         Log.d(TAG, "addRssi");
         Log.d(TAG, "size: " + rssis.size());
         Log.d(TAG, "rssi: " + rssi);
@@ -480,11 +482,30 @@ public abstract  class BlunoLibrary extends Activity{
         }
         rssis.add(0, rssi);
         if (rssis.size() == 10){
-            Log.d(TAG, "10 rssis: " + rssi);
+//            Log.d(TAG, "10 rssis: " + rssi);
             double averageRssi = calculateAverage();
-            Log.d(TAG, "averageRssi: " + averageRssi);
-            ((TextView) findViewById(R.id.serialReveicedText)).append("10 rssis, average: " + averageRssi);
+//            Log.d(TAG, "averageRssi: " + averageRssi);
+//            ((TextView) findViewById(R.id.serialReveicedText)).append("10 rssis, average: " + averageRssi);
             Toast.makeText(getApplicationContext(), "10 rssis, average: "  + averageRssi, Toast.LENGTH_SHORT).show();
+
+            //within about 5 meters maybe???
+            if (averageRssi > -85){
+                Toast.makeText(getApplicationContext(), "UNLOCK - average: "  + averageRssi, Toast.LENGTH_SHORT).show();
+                Log.d(TAG, "sending unlock");
+                if (mDeviceAddress == null ) Log.d(TAG, "mDeviceAddress is null");
+
+                scanLeDevice(false);
+
+                mDeviceAddress = device.getAddress();
+
+                if (mBluetoothLeService.connect(mDeviceAddress)) {
+                    Log.d(TAG, "Connect request success");
+                    mConnectionState=connectionStateEnum.isConnecting;
+                    onConectionStateChange(mConnectionState);
+                    mHandler.postDelayed(mConnectingOverTimeRunnable, 10000);
+
+                }
+            }
         }
     }
 

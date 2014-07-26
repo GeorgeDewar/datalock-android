@@ -11,13 +11,23 @@
 
 
 
-
+    <Button
+        android:id="@+id/wifi_unlock"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Wifi Unlock"/>
 
     <Button
         android:id="@+id/buttonScan"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Scan" />
+
+    <Button
+        android:id="@+id/register"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Register"/>
 
     <!--<Button-->
         <!--android:id="@+id/button_connect"-->

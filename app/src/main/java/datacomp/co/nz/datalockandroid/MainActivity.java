@@ -10,6 +10,8 @@ import android.os.Bundle;
 import android.content.Intent;
 import android.os.Handler;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.animation.AccelerateDecelerateInterpolator;
@@ -25,10 +27,7 @@ public class MainActivity  extends BlunoLibrary {
 
     //main flow views
     private Button buttonScan;
-    private CircularProgressButton buttonWifiUnlock;
-    private Button buttonSerialSend;
-    private EditText serialSendText;
-    private TextView serialReceivedText;
+//    private CircularProgressButton buttonWifiUnlock;
 
     //Registration flow views
     EditText email;
@@ -61,27 +60,6 @@ public class MainActivity  extends BlunoLibrary {
             Log.d(TAG, "No Pin");
             registrationFlow();
         }
-
-
-
-//        buttonConnect.setOnClickListener(new OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                connectToDevice("D0:39:72:A0:9A:BE");
-//            }
-//        });
-
-
-//
-//        buttonScan.setOnClickListener(new OnClickListener() {
-//
-//            @Override
-//            public void onClick(View v) {
-//                // TODO Auto-generated method stub
-//
-////                buttonScanOnClickProcess();										//Alert Dialog for selecting the BLE device
-//            }
-//        });
     }
 
 
@@ -91,38 +69,19 @@ public class MainActivity  extends BlunoLibrary {
         onCreateProcess();														//onCreate Process by BlunoLibrary
 
         serialBegin(115200);
-        buttonWifiUnlock = (CircularProgressButton) findViewById(R.id.wifi_unlock);
-
-
-
-        // Retrieve a PendingIntent that will perform a broadcast
-//        Intent alarmIntent = new Intent(this, AlarmReceiver.class);
-//        pendingIntent = PendingIntent.getBroadcast(this, 0, alarmIntent, 0);
-
-        serialReceivedText=(TextView) findViewById(R.id.serialReveicedText);	//initial the EditText of the received data
-        serialSendText=(EditText) findViewById(R.id.serialSendText);			//initial the EditText of the sending data
-
-
-
-        buttonWifiUnlock.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                new UnlockDoorTask().execute("");
-            }
-        });
-
-        buttonSerialSend = (Button) findViewById(R.id.buttonSerialSend);		//initial the button for sending the data
-        buttonSerialSend.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // TODO Auto-generated method stub
-
-                serialSend(serialSendText.getText().toString());				//send the data to the BLUNO
-            }
-        });
+//        buttonWifiUnlock = (CircularProgressButton) findViewById(R.id.wifi_unlock);
+//
+//        buttonWifiUnlock.setOnClickListener(new OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                new UnlockDoorTask().execute("");
+//            }
+//        });
 
         buttonScan = (Button) findViewById(R.id.buttonScan);					//initial the button for scanning the BLE device
-        buttonScanOnClickProcess();
+//        buttonScanOnClickProcess(); // change this so it's not coupled with the button (may be necessary)
+
+        getSupportFragmentManager().beginTransaction().replace(R.id.container_layout, TabbedPagerFragment.newInstance(), TabbedPagerFragment.TAG).commit();
     }
 
     private void registrationFlow(){
@@ -149,6 +108,26 @@ public class MainActivity  extends BlunoLibrary {
             }
         });
 
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId()) {
+            case R.id.action_settings:
+                return true;
+            case R.id.action_unlock:
+                new UnlockDoorTask().execute("");
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     private void simulateErrorProgress(final CircularProgressButton button) {
@@ -198,16 +177,6 @@ public class MainActivity  extends BlunoLibrary {
     }
 
 
-    public void startAlarm(View view) {
-        manager = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
-        int interval = 10000;
-
-        manager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), interval, pendingIntent);
-        Toast.makeText(this, "Alarm Set", Toast.LENGTH_SHORT).show();
-    }
-
-
-
     protected void onResume(){
         super.onResume();
         System.out.println("BlUNOActivity onResume");
@@ -236,7 +205,11 @@ public class MainActivity  extends BlunoLibrary {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        onDestroyProcess();														//onDestroy Process by BlunoLibrary
+        try {
+            onDestroyProcess();														//onDestroy Process by BlunoLibrary
+        } catch (Exception e) {
+            Log.e(TAG, "crash in onDestroy...", e);
+        }
     }
 
     @Override
@@ -265,9 +238,8 @@ public class MainActivity  extends BlunoLibrary {
     @Override
     public void onSerialReceived(String theString) {							//Once connection data received, this function will be called
         // TODO Auto-generated method stub
-        serialReceivedText.append(theString);							//append the text into the EditText
         //The Serial data from the BLUNO may be sub-packaged, so using a buffer to hold the String is a good choice.
-
+        Log.w(TAG, "receiving data... should be doing something with it... this is the data: " + theString);
     }
 
 

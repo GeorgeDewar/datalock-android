@@ -6,10 +6,8 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Queue;
 
-import datacomp.co.nz.datalockandroid.R;
-
+import android.app.Activity;
 import android.app.Service;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCallback;
@@ -18,7 +16,6 @@ import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.IBinder;
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -28,11 +25,11 @@ import android.bluetooth.BluetoothManager;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -41,7 +38,7 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public abstract  class BlunoLibrary extends Activity{
+public abstract  class BlunoLibrary extends ActionBarActivity{
 
 	private Context mainContext=this;
 
@@ -507,7 +504,9 @@ public abstract  class BlunoLibrary extends Activity{
                 mHandler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        scanLeDevice(false);
+                        //clear rssis
+                        rssis = new ArrayList<Integer>(10);
+                        scanLeDevice(true);
                     }
                 }, 5000);
 

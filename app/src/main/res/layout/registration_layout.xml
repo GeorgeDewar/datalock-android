@@ -16,7 +16,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="18sp"
-        android:text="You need to register to the Datalock service before you can proceed to the application"/>
+        android:text="You need to register the phone to the Datalock service before you can proceed to the application"/>
 
 
     <EditText

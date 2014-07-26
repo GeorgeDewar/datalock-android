@@ -122,6 +122,15 @@ public class MainActivity  extends BlunoLibrary {
     }
 
 
+    private void mainFlow(){
+
+    }
+
+    private void welcomeFlow(){
+
+    }
+
+
     public void startAlarm(View view) {
         manager = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
         int interval = 10000;
@@ -193,89 +202,6 @@ public class MainActivity  extends BlunoLibrary {
         //The Serial data from the BLUNO may be sub-packaged, so using a buffer to hold the String is a good choice.
 
     }
-
-
-
-    private class UnlockDoorTask extends AsyncTask<String, Void, String> {
-
-        @Override
-        protected String doInBackground(String... params) {
-            try{
-
-                URL url = new URL("http://172.26.75.139:3000/api/remote_unlock");
-
-                Log.d(TAG, "url: " + url);
-
-                HttpURLConnection con = (HttpURLConnection) url.openConnection();
-
-                con.setRequestMethod("GET");
-
-                con.setRequestProperty("Accept", "*/*");
-                con.setRequestProperty("Host", "172.26.75.139:3000");
-                con.setRequestProperty("User-Agent", "Mozilla/5.0 (Linux; Android 4.4.2; GT-I9505 Build/KOT49H) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.141 Mobile Safari/537.36");
-
-                con.setUseCaches (false);
-                con.setDoInput(true);
-                con.setDoOutput(false);
-
-                int status = con.getResponseCode();
-                String message = con.getResponseMessage();
-                Log.d(TAG, String.valueOf(status) + "  -  " + message);
-
-                BufferedReader r = new BufferedReader(new InputStreamReader(con.getInputStream()));
-                StringBuilder total = new StringBuilder();
-                String line;
-                while ((line = r.readLine()) != null) {
-                    total.append(line);
-                }
-
-                Log.d(TAG, "input stream: \n" + total.toString());
-
-
-//                runOnUiThread(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        Toast.makeText(getApplicationContext(), printResult, Toast.LENGTH_SHORT).show();
-//
-//                    }
-//                });
-
-//                if (status == 200) {
-//                    runOnUiThread(new Runnable() {
-//                        @Override
-//                        public void run() {
-//                            TaskArrayAdapter adapter = (TaskArrayAdapter) lv.getAdapter();
-//                            adapter.remove(adapter.getItem(pos));
-//                            adapter.notifyDataSetChanged();
-//                        }
-//                    });
-//
-//                }
-
-//                return null;
-
-            } catch(Exception e){
-                Log.e(TAG, "Failed to connect: ", e);
-            }
-                return null;
-        }
-
-
-
-        protected void onProgressUpdate(Integer... params){
-            //Update a progress bar here, or ignore it, it's up to you
-        }
-
-        protected void onPostExecute(String result){
-            Log.d(TAG, "post execute");
-//            Log.d(TAG, "respons: " + result.getStatusLine());
-        }
-
-        protected void onCancelled(){
-        }
-
-    }
-
 
 
 

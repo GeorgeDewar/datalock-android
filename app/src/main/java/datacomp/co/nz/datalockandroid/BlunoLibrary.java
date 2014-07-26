@@ -1,5 +1,9 @@
 package datacomp.co.nz.datalockandroid;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
@@ -10,6 +14,7 @@ import android.app.Service;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCallback;
 import android.bluetooth.BluetoothProfile;
+import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.IBinder;
 import android.annotation.SuppressLint;
@@ -111,6 +116,8 @@ public abstract  class BlunoLibrary extends Activity{
 			onConectionStateChange(mConnectionState);
 			mBluetoothLeService.close();
 		}};
+
+
 		
     private Runnable mDisonnectingOverTimeRunnable=new Runnable(){
 
@@ -486,25 +493,34 @@ public abstract  class BlunoLibrary extends Activity{
             double averageRssi = calculateAverage();
 //            Log.d(TAG, "averageRssi: " + averageRssi);
 //            ((TextView) findViewById(R.id.serialReveicedText)).append("10 rssis, average: " + averageRssi);
-            Toast.makeText(getApplicationContext(), "10 rssis, average: "  + averageRssi, Toast.LENGTH_SHORT).show();
+//            Toast.makeText(getApplicationContext(), "10 rssis, average: "  + averageRssi, Toast.LENGTH_SHORT).show();
 
             //within about 5 meters maybe???
-            if (averageRssi > -85){
+            if (averageRssi > -69){
                 Toast.makeText(getApplicationContext(), "UNLOCK - average: "  + averageRssi, Toast.LENGTH_SHORT).show();
                 Log.d(TAG, "sending unlock");
                 if (mDeviceAddress == null ) Log.d(TAG, "mDeviceAddress is null");
 
                 scanLeDevice(false);
+                new UnlockDoorTask().execute(String.valueOf(getPreferences(MODE_PRIVATE).getInt("PIN", -1)));
 
-                mDeviceAddress = device.getAddress();
+                mHandler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        scanLeDevice(false);
+                    }
+                }, 5000);
 
-                if (mBluetoothLeService.connect(mDeviceAddress)) {
-                    Log.d(TAG, "Connect request success");
-                    mConnectionState=connectionStateEnum.isConnecting;
-                    onConectionStateChange(mConnectionState);
-                    mHandler.postDelayed(mConnectingOverTimeRunnable, 10000);
-
-                }
+                //Bluno DIED!!!! commented out the code
+//                mDeviceAddress = device.getAddress();
+//
+//                if (mBluetoothLeService.connect(mDeviceAddress)) {
+//                    Log.d(TAG, "Connect request success");
+//                    mConnectionState=connectionStateEnum.isConnecting;
+//                    onConectionStateChange(mConnectionState);
+//                    mHandler.postDelayed(mConnectingOverTimeRunnable, 10000);
+//
+//                }
             }
         }
     }
@@ -747,4 +763,84 @@ public abstract  class BlunoLibrary extends Activity{
 			return view;
 		}
 	}
+
+    protected class UnlockDoorTask extends AsyncTask<String, Void, String> {
+
+        @Override
+        protected String doInBackground(String... params) {
+            try {
+
+                URL url = new URL("http://172.26.75.139:3000/api/remote_unlock");
+
+                Log.d(TAG, "url: " + url);
+
+                HttpURLConnection con = (HttpURLConnection) url.openConnection();
+
+                con.setRequestMethod("GET");
+
+                con.setRequestProperty("Accept", "*/*");
+                con.setRequestProperty("Host", "172.26.75.139:3000");
+                con.setRequestProperty("User-Agent", "Mozilla/5.0 (Linux; Android 4.4.2; GT-I9505 Build/KOT49H) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.141 Mobile Safari/537.36");
+
+                con.setUseCaches(false);
+                con.setDoInput(true);
+                con.setDoOutput(false);
+
+                int status = con.getResponseCode();
+                String message = con.getResponseMessage();
+                Log.d(TAG, String.valueOf(status) + "  -  " + message);
+
+                BufferedReader r = new BufferedReader(new InputStreamReader(con.getInputStream()));
+                StringBuilder total = new StringBuilder();
+                String line;
+                while ((line = r.readLine()) != null) {
+                    total.append(line);
+                }
+
+                Log.d(TAG, "input stream: \n" + total.toString());
+
+
+//                runOnUiThread(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        Toast.makeText(getApplicationContext(), printResult, Toast.LENGTH_SHORT).show();
+//
+//                    }
+//                });
+
+//                if (status == 200) {
+//                    runOnUiThread(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            TaskArrayAdapter adapter = (TaskArrayAdapter) lv.getAdapter();
+//                            adapter.remove(adapter.getItem(pos));
+//                            adapter.notifyDataSetChanged();
+//                        }
+//                    });
+//
+//                }
+
+//                return null;
+
+            } catch (Exception e) {
+                Log.e(TAG, "Failed to connect: ", e);
+            }
+            return null;
+        }
+
+
+        protected void onProgressUpdate(Integer... params) {
+            //Update a progress bar here, or ignore it, it's up to you
+        }
+
+        protected void onPostExecute(String result) {
+            Log.d(TAG, "post execute");
+//            Log.d(TAG, "respons: " + result.getStatusLine());
+        }
+
+        protected void onCancelled() {
+        }
+
+    }
+
 }

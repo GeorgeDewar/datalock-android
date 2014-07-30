@@ -27,7 +27,6 @@ public class MainActivity  extends BlunoLibrary {
 
     //main flow views
     private Button buttonScan;
-//    private CircularProgressButton buttonWifiUnlock;
 
     //Registration flow views
     EditText email;
@@ -64,22 +63,13 @@ public class MainActivity  extends BlunoLibrary {
 
 
     private void mainFlow(){
-
         setContentView(R.layout.activity_main);
         onCreateProcess();														//onCreate Process by BlunoLibrary
 
         serialBegin(115200);
-//        buttonWifiUnlock = (CircularProgressButton) findViewById(R.id.wifi_unlock);
-//
-//        buttonWifiUnlock.setOnClickListener(new OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                new UnlockDoorTask().execute("");
-//            }
-//        });
 
         buttonScan = (Button) findViewById(R.id.buttonScan);					//initial the button for scanning the BLE device
-//        buttonScanOnClickProcess(); // change this so it's not coupled with the button (may be necessary)
+        buttonScanOnClickProcess(); // change this so it's not coupled with the button (may be necessary)
 
         getSupportFragmentManager().beginTransaction().replace(R.id.container_layout, TabbedPagerFragment.newInstance(), TabbedPagerFragment.TAG).commit();
     }
@@ -118,12 +108,20 @@ public class MainActivity  extends BlunoLibrary {
     }
 
     @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        ((MenuItem) menu.findItem(R.id.action_add_user)).setVisible(false);
+        return true;
+    }
+
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
         switch (item.getItemId()) {
             case R.id.action_settings:
                 return true;
             case R.id.action_unlock:
+                Log.d(TAG, "unlock the door");
                 new UnlockDoorTask().execute("");
                 return true;
         }

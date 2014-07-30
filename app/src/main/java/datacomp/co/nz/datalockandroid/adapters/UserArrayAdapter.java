@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.TextView;
 
 import java.util.List;
 
@@ -38,16 +39,15 @@ public class UserArrayAdapter extends ArrayAdapter<View> {
 
         View v = convertView;
         if (v == null) {
-            v = inf.inflate(R.layout.admin_list_item, parent, false);
+            v = inf.inflate(R.layout.user_list_item, parent, false);
         }
 
-        LinearLayout container = (LinearLayout) v;
-
         //get the current answer
-        Task job = jobs.get(pos);
+        User user = users.get(pos);
 
-        ((TextView) v.findViewById(R.id.description)).setText(job.getTimeDesc());
-        ((TextView) v.findViewById(R.id.group)).setText(job.getAltRef2());
+        ((TextView) v.findViewById(R.id.name)).setText(user.getName());
+        ((TextView) v.findViewById(R.id.email)).setText(user.getEmail());
+        ((TextView) v.findViewById(R.id.phone)).setText(user.getPhone());
 
         return v;
     }

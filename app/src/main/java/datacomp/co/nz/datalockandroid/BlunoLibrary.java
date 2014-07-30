@@ -65,6 +65,8 @@ public abstract  class BlunoLibrary extends ActionBarActivity{
 	private int mBaudrate=115200;	//set the default baud rate to 115200
 	private String mPassword="AT+PASSWOR=DFRobot\r\n";
 
+    private long lastUnlockTime;
+
     private ArrayList<Integer> rssis = new ArrayList<Integer>(10);
 	
 	
@@ -141,62 +143,6 @@ public abstract  class BlunoLibrary extends ActionBarActivity{
 		
         Intent gattServiceIntent = new Intent(mainContext, BluetoothLeService.class);
         mainContext.bindService(gattServiceIntent, mServiceConnection, Context.BIND_AUTO_CREATE);
-        
-        
-		// Initializes list view adapter.
-//		mLeDeviceListAdapter = new LeDeviceListAdapter();
-//		// Initializes and show the scan Device Dialog
-//		mScanDeviceDialog = new AlertDialog.Builder(mainContext)
-//		.setTitle("BLE Device Scan...").setAdapter(mLeDeviceListAdapter, new DialogInterface.OnClickListener() {
-//
-//			@Override
-//			public void onClick(DialogInterface dialog, int which)
-//			{
-//				final BluetoothDevice device = mLeDeviceListAdapter.getDevice(which);
-//				if (device == null)
-//					return;
-//				scanLeDevice(false);
-//				System.out.println("onListItemClick " + device.getName().toString());
-//
-//				System.out.println("Device Name:"+device.getName() + "   " + "Device Name:" + device.getAddress());
-//
-//				mDeviceName=device.getName().toString();
-//				mDeviceAddress=device.getAddress().toString();
-//
-//		        if(mDeviceName.equals("No Device Available") && mDeviceAddress.equals("No Address Available"))
-//		        {
-//		        	mConnectionState=connectionStateEnum.isToScan;
-//		        	onConectionStateChange(mConnectionState);
-//		        }
-//		        else{
-//		        	if (mBluetoothLeService.connect(mDeviceAddress)) {
-//				        Log.d(TAG, "Connect request success");
-//			        	mConnectionState=connectionStateEnum.isConnecting;
-//			        	onConectionStateChange(mConnectionState);
-//			            mHandler.postDelayed(mConnectingOverTimeRunnable, 10000);
-//		        	}
-//			        else {
-//				        Log.d(TAG, "Connect request fail");
-//			        	mConnectionState=connectionStateEnum.isToScan;
-//			        	onConectionStateChange(mConnectionState);
-//					}
-//		        }
-//			}
-//		})
-//		.setOnCancelListener(new DialogInterface.OnCancelListener(){
-//
-//			@Override
-//			public void onCancel(DialogInterface arg0) {
-//				System.out.println("mBluetoothAdapter.stopLeScan");
-//
-//	        	mConnectionState=connectionStateEnum.isToScan;
-//	        	onConectionStateChange(mConnectionState);
-//				mScanDeviceDialog.dismiss();
-//
-//				scanLeDevice(false);
-//			}
-//		}).create();
-		
     }
     
     
@@ -493,33 +439,23 @@ public abstract  class BlunoLibrary extends ActionBarActivity{
 //            Toast.makeText(getApplicationContext(), "10 rssis, average: "  + averageRssi, Toast.LENGTH_SHORT).show();
 
             //within about 5 meters maybe???
-            if (averageRssi > -69){
-                Toast.makeText(getApplicationContext(), "UNLOCK - average: "  + averageRssi, Toast.LENGTH_SHORT).show();
-                Log.d(TAG, "sending unlock");
+            if (averageRssi > -67){
+                long currentTime = System.currentTimeMillis();
                 if (mDeviceAddress == null ) Log.d(TAG, "mDeviceAddress is null");
-
-                scanLeDevice(false);
-                new UnlockDoorTask().execute(String.valueOf(getPreferences(MODE_PRIVATE).getInt("PIN", -1)));
-
-                mHandler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        //clear rssis
-                        rssis = new ArrayList<Integer>(10);
-                        scanLeDevice(true);
-                    }
-                }, 5000);
-
-                //Bluno DIED!!!! commented out the code
-//                mDeviceAddress = device.getAddress();
-//
-//                if (mBluetoothLeService.connect(mDeviceAddress)) {
-//                    Log.d(TAG, "Connect request success");
-//                    mConnectionState=connectionStateEnum.isConnecting;
-//                    onConectionStateChange(mConnectionState);
-//                    mHandler.postDelayed(mConnectingOverTimeRunnable, 10000);
-//
-//                }
+                if (lastUnlockTime == 0){
+                    // do request
+                    lastUnlockTime = currentTime;
+                    Log.d(TAG, "sending unlock");
+                    new UnlockDoorTask().execute(String.valueOf(getPreferences(MODE_PRIVATE).getInt("PIN", -1)));
+                } else if ((currentTime - lastUnlockTime) > 18000) {
+                    //do request
+                    lastUnlockTime = currentTime;
+                    Log.d(TAG, "sending unlock");
+                    new UnlockDoorTask().execute(String.valueOf(getPreferences(MODE_PRIVATE).getInt("PIN", -1)));
+                } else {
+                    //do nothing
+                    Log.d(TAG, "less than 15 seconds apart, skip this one");
+                }
             }
         }
     }
@@ -794,6 +730,16 @@ public abstract  class BlunoLibrary extends ActionBarActivity{
                 String line;
                 while ((line = r.readLine()) != null) {
                     total.append(line);
+                }
+                Log.d(TAG, "status: " + status);
+
+                if (status == 200){
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(getApplicationContext(), "Door successfully unlocked!", Toast.LENGTH_SHORT).show();
+                        }
+                    });
                 }
 
                 Log.d(TAG, "input stream: \n" + total.toString());

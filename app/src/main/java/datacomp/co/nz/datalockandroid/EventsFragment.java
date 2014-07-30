@@ -7,14 +7,11 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
@@ -26,28 +23,26 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import datacomp.co.nz.datalockandroid.adapters.EventArrayAdapter;
 import datacomp.co.nz.datalockandroid.adapters.UserArrayAdapter;
+import datacomp.co.nz.datalockandroid.model.Event;
 import datacomp.co.nz.datalockandroid.model.User;
 
 
-/**
- * A simple {@link Fragment} subclass.
- *
- */
-public class UsersFragment extends Fragment {
-    public static final String TAG = "UsersFragment";
+public class EventsFragment extends Fragment {
+    public static final String TAG = "EventsFragment";
     MainActivity mainActivity;
 
-    ListView userList;
+    ListView eventsList;
 
-    public static UsersFragment newInstance() {
-        UsersFragment fragment = new UsersFragment();
+
+    public static EventsFragment newInstance() {
+        EventsFragment fragment = new EventsFragment();
         Bundle args = new Bundle();
         fragment.setArguments(args);
         return fragment;
     }
-
-    public UsersFragment() {
+    public EventsFragment() {
         // Required empty public constructor
     }
 
@@ -55,7 +50,6 @@ public class UsersFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         Log.d(TAG, "onCreate");
-        setHasOptionsMenu(true);
     }
 
 
@@ -63,8 +57,9 @@ public class UsersFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View rootView = inflater.inflate(R.layout.fragment_users, container, false);
-        userList = (ListView) rootView.findViewById(R.id.user_list);
+        View rootView = inflater.inflate(R.layout.fragment_events, container, false);
+        eventsList = (ListView) rootView.findViewById(R.id.events_list);
+
         return rootView;
     }
 
@@ -72,7 +67,7 @@ public class UsersFragment extends Fragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         mainActivity = (MainActivity) getActivity();
-        new GetUsersTask().execute();
+        new GetEventsTask().execute();
     }
 
     @Override
@@ -81,33 +76,13 @@ public class UsersFragment extends Fragment {
     }
 
 
-    @Override
-    public void onPrepareOptionsMenu(Menu menu) {
-        super.onPrepareOptionsMenu(menu);
-        ((MenuItem) menu.findItem(R.id.action_add_user)).setVisible(true);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        Log.d("onOptionsItemSelected","yes");
-        switch (item.getItemId()) {
-            case R.id.action_add_user:
-                //add new user
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
-
-
-
-    private class GetUsersTask extends AsyncTask<Void, Void, List<User>> {
-        List<User> users = new ArrayList<User>();
+    private class GetEventsTask extends AsyncTask<Void, Void, List<Event>> {
+        List<Event> events = new ArrayList<Event>();
 
         @Override
-        protected List<User> doInBackground(Void... params) {
+        protected List<Event> doInBackground(Void... params) {
             try {
-                URL url = new URL("http://172.26.75.139:3000/api/users") ;
+                URL url = new URL("http://172.26.75.139:3000/api/recent_events") ;
 
                 HttpURLConnection con = (HttpURLConnection) url.openConnection();
 
@@ -143,18 +118,21 @@ public class UsersFragment extends Fragment {
                     JsonObject jsonUser = jsonArray.get(i).getAsJsonObject().getAsJsonObject("api");
 
                     long id = jsonUser.get("id").getAsLong();
-                    String email = jsonUser.get("email").getAsString();
-                    String name = jsonUser.get("name").getAsString();
-                    boolean admin = jsonUser.get("admin").getAsBoolean();
-                    int pin = jsonUser.get("pin").getAsInt();
-                    String phone = jsonUser.get("ph_number").getAsString();
-                    String created = jsonUser.get("created_at").getAsString();
-                    String updated = jsonUser.get("updated_at").getAsString();
+                    String action = jsonUser.get("action").getAsString();
+                    long userId;
+                    if (jsonUser.get("user_id").isJsonNull()) {
+                        userId = -1;
+                    } else {
+                        userId = jsonUser.get("user_id").getAsLong();
+                    }
+                    Log.d(TAG, "userId: " + userId);
+                    String createdAt = jsonUser.get("created_at").getAsString();
+                    String updatedAt = jsonUser.get("updated_at").getAsString();
 
-                    User user = new User(id, email, name, admin, pin, phone, created, updated);
-                    users.add(user);
+                    Event event = new Event(id, action, userId, createdAt, updatedAt);
+                    events.add(event);
                 }
-                return users;
+                return events;
 
             } catch (SocketTimeoutException e) {
                 Log.e(TAG, "timeout exception", e);
@@ -164,13 +142,16 @@ public class UsersFragment extends Fragment {
             return null;
         }
 
-        protected void onPostExecute(final List<User> result){
+        protected void onPostExecute(final List<Event> result){
             Log.d(TAG, "post execute");
             if (result != null){
                 mainActivity.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        userList.setAdapter(new UserArrayAdapter(getActivity(), R.layout.user_list_item, result));
+                        if (result == null) Log.d(TAG, "1");
+                        if (eventsList == null) Log.d(TAG, "2");
+                        if (result == null) Log.d(TAG, "3");
+                        eventsList.setAdapter(new EventArrayAdapter(getActivity(), R.layout.event_list_item, result));
                     }
                 });
             }
@@ -179,7 +160,5 @@ public class UsersFragment extends Fragment {
         protected void onCancelled(){
         }
     }
-
-
 
 }

@@ -58,7 +58,6 @@ public class TabbedPagerFragment extends Fragment {
     public void onActivityCreated(Bundle savedInstanceState){
         super.onActivityCreated(savedInstanceState);
         mainActivity = (MainActivity) getActivity();
-        mainActivity.setTitle("Favourites");
 
         mDemoCollectionPagerAdapter = new DemoCollectionPagerAdapter(mainActivity.getSupportFragmentManager());
         mViewPager.setAdapter(mDemoCollectionPagerAdapter);
@@ -80,7 +79,7 @@ public class TabbedPagerFragment extends Fragment {
                 case 0:
                     return UsersFragment.newInstance();
                 case 1:
-                    return new DemoObjectFragment();
+                    return EventsFragment.newInstance();
                 default:
                     return new DemoObjectFragment();
             }

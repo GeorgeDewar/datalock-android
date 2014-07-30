@@ -14,16 +14,16 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Name:"
+            android:text="Action:"
             android:gravity="right"
-            android:paddingRight="65dp"/>
+            android:paddingRight="50dp"/>
 
         <TextView
-            android:id="@+id/name"
+            android:id="@+id/action"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="2"/>
-        </LinearLayout>
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -33,12 +33,12 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Email:"
+            android:text="User Id:"
             android:gravity="right"
-            android:paddingRight="65dp"/>
+            android:paddingRight="50dp"/>
 
         <TextView
-            android:id="@+id/email"
+            android:id="@+id/user_id"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="2"/>
@@ -53,12 +53,12 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Phone:"
+            android:text="Datetime:"
             android:gravity="right"
-            android:paddingRight="65dp"/>
+            android:paddingRight="50dp"/>
 
         <TextView
-            android:id="@+id/phone"
+            android:id="@+id/date_time"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="2"/>

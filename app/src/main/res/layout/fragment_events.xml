@@ -7,9 +7,9 @@
     tools:context=".MainActivity" >
 
     <ListView
-        android:id="@+id/user_list"
+        android:id="@+id/events_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 
 
-    </LinearLayout>
+</LinearLayout>

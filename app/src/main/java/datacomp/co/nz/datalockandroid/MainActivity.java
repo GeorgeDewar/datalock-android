@@ -25,6 +25,8 @@ import com.dd.CircularProgressButton;
 public class MainActivity  extends BlunoLibrary {
     static final String TAG = "MainActivity";
 
+    public static final String SERVER_ARG= "server";
+
     //main flow views
     private Button buttonScan;
 
@@ -51,6 +53,9 @@ public class MainActivity  extends BlunoLibrary {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if (!getPreferences(MODE_PRIVATE).contains(SERVER_ARG))
+            getPreferences(MODE_PRIVATE).edit().putString(SERVER_ARG, "http://mars-box.datacom.co.nz:14080").commit();
 
         if (getPreferences(MODE_PRIVATE).getInt("PIN", -1) != -1) {
             Log.d(TAG, "PIN: " + getPreferences(MODE_PRIVATE).getInt("PIN", -1));
@@ -92,7 +97,6 @@ public class MainActivity  extends BlunoLibrary {
                     simulateErrorProgress(registerButton);
                 } else {
                     //success
-
                     simulateSuccessProgress(registerButton);
                 }
             }
@@ -119,6 +123,7 @@ public class MainActivity  extends BlunoLibrary {
 
         switch (item.getItemId()) {
             case R.id.action_settings:
+                getSupportFragmentManager().beginTransaction().replace(R.id.container_layout, new SettingsFragment()).addToBackStack(null).commit();
                 return true;
             case R.id.action_unlock:
                 Log.d(TAG, "unlock the door");

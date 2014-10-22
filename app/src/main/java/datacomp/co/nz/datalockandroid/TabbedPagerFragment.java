@@ -59,7 +59,7 @@ public class TabbedPagerFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
         mainActivity = (MainActivity) getActivity();
 
-        mDemoCollectionPagerAdapter = new DemoCollectionPagerAdapter(mainActivity.getSupportFragmentManager());
+        mDemoCollectionPagerAdapter = new DemoCollectionPagerAdapter(getChildFragmentManager());
         mViewPager.setAdapter(mDemoCollectionPagerAdapter);
 
         PagerSlidingTabStrip tabs = (PagerSlidingTabStrip) getView().findViewById(R.id.tabs);

@@ -2,6 +2,7 @@ package datacomp.co.nz.datalockandroid;
 
 
 
+import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -82,14 +83,14 @@ public class EventsFragment extends Fragment {
         @Override
         protected List<Event> doInBackground(Void... params) {
             try {
-                URL url = new URL("http://172.26.75.139:3000/api/recent_events") ;
+                URL url = new URL(mainActivity.getPreferences(Context.MODE_PRIVATE).getString(mainActivity.SERVER_ARG, "") + "/api/recent_events") ;
 
                 HttpURLConnection con = (HttpURLConnection) url.openConnection();
 
                 con.setRequestMethod("GET");
 
                 con.setRequestProperty("Accept", "*/*");
-                con.setRequestProperty("Host", "172.26.75.139:3000");
+                con.setRequestProperty("Host", mainActivity.getPreferences(Context.MODE_PRIVATE).getString(mainActivity.SERVER_ARG, ""));
                 con.setRequestProperty("User-Agent", "Mozilla/5.0 (Linux; Android 4.4.2; GT-I9505 Build/KOT49H) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.141 Mobile Safari/537.36");
 
                 con.setUseCaches(false);

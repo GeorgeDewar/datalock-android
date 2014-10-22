@@ -42,6 +42,8 @@ public abstract  class BlunoLibrary extends ActionBarActivity{
 
 	private Context mainContext=this;
 
+    public static final String SERVER_ARG= "server";
+
 	
 //	public BlunoLibrary(Context theContext) {
 //		
@@ -424,21 +426,18 @@ public abstract  class BlunoLibrary extends ActionBarActivity{
 	};
 
     private void addRssi (int rssi, BluetoothDevice device){
-        Log.d(TAG, "addRssi");
-        Log.d(TAG, "size: " + rssis.size());
-        Log.d(TAG, "rssi: " + rssi);
         if (rssis.size() == 10){
             rssis.remove(9);
         }
         rssis.add(0, rssi);
         if (rssis.size() == 10){
-//            Log.d(TAG, "10 rssis: " + rssi);
+            Log.d(TAG, "10 rssis: " + rssi);
             double averageRssi = calculateAverage();
-//            Log.d(TAG, "averageRssi: " + averageRssi);
+            Log.d(TAG, "averageRssi: " + averageRssi);
 //            ((TextView) findViewById(R.id.serialReveicedText)).append("10 rssis, average: " + averageRssi);
 //            Toast.makeText(getApplicationContext(), "10 rssis, average: "  + averageRssi, Toast.LENGTH_SHORT).show();
 
-            //within about 5 meters maybe???
+            //within about ~5 meters maybe???
             if (averageRssi > -67){
                 long currentTime = System.currentTimeMillis();
                 if (mDeviceAddress == null ) Log.d(TAG, "mDeviceAddress is null");
@@ -705,7 +704,7 @@ public abstract  class BlunoLibrary extends ActionBarActivity{
         protected String doInBackground(String... params) {
             try {
 
-                URL url = new URL("http://172.26.75.139:3000/api/remote_unlock");
+                URL url = new URL(getPreferences(Context.MODE_PRIVATE).getString(SERVER_ARG, "") + "/api/remote_unlock");
 
                 Log.d(TAG, "url: " + url);
 
@@ -714,7 +713,7 @@ public abstract  class BlunoLibrary extends ActionBarActivity{
                 con.setRequestMethod("GET");
 
                 con.setRequestProperty("Accept", "*/*");
-                con.setRequestProperty("Host", "172.26.75.139:3000");
+                con.setRequestProperty("Host", getPreferences(Context.MODE_PRIVATE).getString(SERVER_ARG, ""));
                 con.setRequestProperty("User-Agent", "Mozilla/5.0 (Linux; Android 4.4.2; GT-I9505 Build/KOT49H) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.141 Mobile Safari/537.36");
 
                 con.setUseCaches(false);

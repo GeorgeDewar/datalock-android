@@ -2,6 +2,7 @@ package datacomp.co.nz.datalockandroid;
 
 
 
+import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -66,7 +67,7 @@ public class UsersFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_users, container, false);
         userList = (ListView) rootView.findViewById(R.id.user_list);
         return rootView;
-    }
+}
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
@@ -89,7 +90,7 @@ public class UsersFragment extends Fragment {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        Log.d("onOptionsItemSelected","yes");
+        Log.d("onOptionsItemSelected", "yes");
         switch (item.getItemId()) {
             case R.id.action_add_user:
                 //add new user
@@ -107,14 +108,16 @@ public class UsersFragment extends Fragment {
         @Override
         protected List<User> doInBackground(Void... params) {
             try {
-                URL url = new URL("http://172.26.75.139:3000/api/users") ;
+                URL url = new URL(mainActivity.getPreferences(Context.MODE_PRIVATE).getString(mainActivity.SERVER_ARG, "") + "/api/users") ;
+
+                Log.d(TAG, "unlock users url: " + url);
 
                 HttpURLConnection con = (HttpURLConnection) url.openConnection();
 
                 con.setRequestMethod("GET");
 
                 con.setRequestProperty("Accept", "*/*");
-                con.setRequestProperty("Host", "172.26.75.139:3000");
+                con.setRequestProperty("Host", mainActivity.getPreferences(Context.MODE_PRIVATE).getString(mainActivity.SERVER_ARG, ""));
                 con.setRequestProperty("User-Agent", "Mozilla/5.0 (Linux; Android 4.4.2; GT-I9505 Build/KOT49H) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.141 Mobile Safari/537.36");
 
                 con.setUseCaches(false);
@@ -138,7 +141,7 @@ public class UsersFragment extends Fragment {
                 JsonParser jsonParser = new JsonParser();
                 JsonObject jo = (JsonObject)jsonParser.parse(total.toString());
                 JsonArray jsonArray = jo.getAsJsonArray("api");
-//
+
                 for(int i = 0; i < jsonArray.size(); i++) {
                     JsonObject jsonUser = jsonArray.get(i).getAsJsonObject().getAsJsonObject("api");
 
